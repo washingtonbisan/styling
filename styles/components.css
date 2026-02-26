@@ -1,0 +1,54 @@
+.waveBar {
+  display: inline-block;
+  width: 3px;
+  border-radius: 9999px;
+  background-color: var(--accent-primary);
+  animation: wave 1.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.waveBar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.waveBar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.waveBar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.waveBar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* Shimmer skeleton — complex gradient animation */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-elevated) 25%,
+    var(--surface-overlay) 50%,
+    var(--surface-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerMove 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmerMove {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

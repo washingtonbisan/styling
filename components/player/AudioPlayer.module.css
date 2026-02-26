@@ -1,0 +1,274 @@
+.player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background-color: var(--surface-elevated);
+  border-top: 1px solid var(--border-default);
+  display: grid;
+  /* Three columns: track info | controls | volume */
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 40;
+
+  /* Backdrop blur for glassmorphism effect */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ── Track Info (left column) ── */
+.trackInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0; /* Allows text truncation to work */
+}
+
+.albumArt {
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  /* Subtle hover lift */
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.trackText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trackName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.artistName {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+}
+
+/* ── Controls (center column) ── */
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.controlButtons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.controlBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.2s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    color: var(--text-primary);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.playBtn {
+  composes: controlBtn; /* CSS Modules composition — inherits all controlBtn styles */
+  width: 36px;
+  height: 36px;
+  background-color: var(--text-primary);
+  color: var(--surface-base);
+  border-radius: 50%;
+
+  &:hover {
+    color: var(--surface-base);
+    background-color: var(--text-secondary);
+    transform: scale(1.06);
+  }
+}
+
+.activeBtn {
+  color: var(--accent-primary) !important;
+
+  /* Active indicator dot */
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--accent-primary);
+  }
+}
+
+/* Progress bar — custom range input styling */
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.timeLabel {
+  font-size: 0.6875rem; /* 11px */
+  color: var(--text-secondary);
+  min-width: 2.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums; /* Fixed-width numbers — no layout shift as time changes */
+}
+
+.progressBar {
+  flex: 1;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: var(--surface-overlay);
+  position: relative;
+  cursor: pointer;
+  transition: height 0.15s ease;
+
+  &:hover {
+    height: 6px; /* Expands on hover like real Spotify */
+  }
+
+  &:hover .progressFill::after {
+    opacity: 1; /* Show thumb handle on hover */
+  }
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--text-primary);
+  position: relative;
+  pointer-events: none;
+  transition: background-color 0.2s ease;
+
+  .progressBar:hover & {
+    background-color: var(--accent-primary);
+  }
+
+  /* Drag thumb */
+  &::after {
+    content: "";
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--text-primary);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+}
+
+/* ── Volume (right column) ── */
+.volumeSection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.volumeBar {
+  width: 93px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: var(--surface-overlay);
+  cursor: pointer;
+  transition: height 0.15s ease;
+
+  &:hover {
+    height: 6px;
+  }
+}
+
+.volumeFill {
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--text-primary);
+  transition: background-color 0.2s ease;
+
+  .volumeBar:hover & {
+    background-color: var(--accent-primary);
+  }
+}
+
+/* ── Waveform (playing indicator) ── */
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .player {
+    grid-template-columns: 1fr auto;
+    height: 72px;
+    padding: 0 12px;
+  }
+
+  /* Hide volume on mobile */
+  .volumeSection {
+    display: none;
+  }
+
+  .progressContainer {
+    display: none;
+  }
+
+  .controlButtons {
+    gap: 12px;
+  }
+}

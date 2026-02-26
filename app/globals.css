@@ -1,0 +1,253 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* 2. Tailwind Import */
+@import "tailwindcss";
+
+/* 3. NEW v4 WAY: Define your custom utilities here */
+.dark {
+  /* Surfaces */
+  --surface-base: #191414;
+  --surface-elevated: #282828;
+  --surface-overlay: #3e3e3e;
+  --surface-subtle: #1e1e1e;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-disabled: #535353;
+  --text-inverse: #191414;
+
+  /* Accent */
+  --accent-primary: #1db954;
+  --accent-hover: #1ed760;
+  --accent-active: #169c46;
+  --accent-subtle: rgba(29, 185, 84, 0.15);
+
+  /* Status */
+  --status-error: #f87171;
+  --status-success: #1db954;
+  --status-warning: #facc15;
+  --status-info: #60a5fa;
+
+  /* Borders */
+  --border-default: #3e3e3e;
+  --border-strong: #777777;
+  --border-focus: #ffffff;
+
+  /* Shadows */
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.8);
+}
+
+/* LIGHT THEME */
+.light {
+  --surface-base: #ffffff;
+  --surface-elevated: #f6f6f6;
+  --surface-overlay: #e8e8e8;
+  --surface-subtle: #fafafa;
+
+  --text-primary: #191414;
+  --text-secondary: #535353;
+  --text-disabled: #b3b3b3;
+  --text-inverse: #ffffff;
+
+  --accent-primary: #1db954;
+  --accent-hover: #169c46;
+  --accent-active: #0f7a34;
+  --accent-subtle: rgba(29, 185, 84, 0.1);
+
+  --status-error: #dc2626;
+  --status-success: #16a34a;
+  --status-warning: #ca8a04;
+  --status-info: #2563eb;
+
+  --border-default: #e8e8e8;
+  --border-strong: #b3b3b3;
+  --border-focus: #191414;
+
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.2);
+}
+
+/* HIGH CONTRAST THEME — Accessibility */
+.high-contrast {
+  --surface-base: #000000;
+  --surface-elevated: #0a0a0a;
+  --surface-overlay: #1a1a1a;
+  --surface-subtle: #050505;
+
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-disabled: #888888;
+  --text-inverse: #000000;
+
+  --accent-primary: #00ff66; /* Brighter green for higher contrast */
+  --accent-hover: #33ff85;
+  --accent-active: #00cc52;
+  --accent-subtle: rgba(0, 255, 102, 0.2);
+
+  --status-error: #ff4444;
+  --status-success: #00ff66;
+  --status-warning: #ffd700;
+  --status-info: #00bfff;
+
+  --border-default: #444444;
+  --border-strong: #ffffff;
+  --border-focus: #00ff66;
+
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.9);
+  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 1);
+}
+
+/* ─────────────────────────────────────────────────────
+   BASE LAYER — resets + global element styles
+───────────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply box-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+    /* Smooth theme transitions — applies to ALL elements */
+    color-scheme: dark;
+  }
+
+  .light {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--surface-base);
+    color: var(--text-primary);
+    @apply font-body antialiased transition-colors duration-300;
+    /* Theme switch is smooth because of this transition */
+  }
+
+  /* Smooth transition for ALL theme-aware properties */
+  *,
+  *::before,
+  *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 300ms;
+    transition-timing-function: ease;
+  }
+
+  /* Override for things that should NOT have theme transitions
+     (animations, transforms, etc.) */
+  .no-theme-transition,
+  .no-theme-transition * {
+    transition: none !important;
+  }
+
+  /* Focus ring — visible and high-contrast */
+  :focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   COMPONENT LAYER — reusable class utilities
+───────────────────────────────────────────────────── */
+@layer components {
+  /* Typography scale */
+  .text-display-xl {
+    @apply font-display text-6xl font-extrabold tracking-tight leading-none;
+  }
+  .text-display-lg {
+    @apply font-display text-5xl font-bold tracking-tight leading-tight;
+  }
+  .text-heading-xl {
+    @apply font-display text-4xl font-bold leading-tight;
+  }
+  .text-heading-lg {
+    @apply font-display text-3xl font-bold;
+  }
+  .text-heading-md {
+    @apply font-display text-2xl font-semibold;
+  }
+  .text-heading-sm {
+    @apply font-display text-xl font-semibold;
+  }
+  .text-body-lg {
+    @apply font-body text-lg;
+  }
+  .text-body-md {
+    @apply font-body text-base;
+  }
+  .text-body-sm {
+    @apply font-body text-sm;
+  }
+  .text-caption {
+    @apply font-body text-xs uppercase tracking-wider;
+  }
+  .text-label {
+    @apply font-body text-sm font-semibold;
+  }
+
+  /* Surface utilities */
+  .surface-base {
+    background-color: var(--surface-base);
+  }
+  .surface-elevated {
+    background-color: var(--surface-elevated);
+  }
+  .surface-overlay {
+    background-color: var(--surface-overlay);
+  }
+
+  /* Text utilities */
+  .text-primary-color {
+    color: var(--text-primary);
+  }
+  .text-secondary-color {
+    color: var(--text-secondary);
+  }
+  .text-accent {
+    color: var(--accent-primary);
+  }
+
+  /* Interactive base */
+  .interactive {
+    @apply cursor-pointer select-none transition-all duration-200;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2;
+    outline-color: var(--border-focus);
+  }
+
+  /* Spotify pill button base */
+  .btn-base {
+    @apply inline-flex items-center justify-center gap-2
+           font-body font-bold rounded-full
+           transition-all duration-200 cursor-pointer select-none
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+}
