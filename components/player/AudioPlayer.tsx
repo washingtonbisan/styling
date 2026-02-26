@@ -1,19 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/cs";
-// import { cn } from "@/lib/cn";
 import styles from "./AudioPlayer.module.css";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 
-// Waveform bars component (using CSS Module animation from styles/components.css)
+// Animated waveform shown when track is playing
 function Waveform() {
   return (
     <div className={styles.waveform} aria-label="Now playing">
       {[12, 20, 8, 16, 10].map((height, i) => (
         <span
           key={i}
-          className={styles.waveBar} /* from styles/components.css via module */
+          className={styles.waveBar}
           style={{ height: `${height}px` }}
           aria-hidden="true"
         />
@@ -27,22 +28,20 @@ interface AudioPlayerProps {
     title: string;
     artist: string;
     albumArt: string;
-    duration: number; // seconds
+    duration: number; // in seconds
   };
 }
 
 export function AudioPlayer({ track }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(30); // percentage
-  const [volume, setVolume] = useState(75); // percentage
+  const [progress, setProgress] = useState(30);   // percentage 0-100
+  const [volume, setVolume] = useState(75);        // percentage 0-100
   const [isShuffled, setIsShuffled] = useState(false);
   const [isRepeating, setIsRepeating] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [prevVolume, setPrevVolume] = useState(75); // remember volume before mute
 
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  };
+  const playerRef = useRef<HTMLElement>(null);
 
   const currentTrack = track ?? {
     title: "Blinding Lights",
@@ -51,11 +50,60 @@ export function AudioPlayer({ track }: AudioPlayerProps) {
     duration: 200,
   };
 
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
   const currentSeconds = (progress / 100) * currentTrack.duration;
+  const displayVolume = isMuted ? 0 : volume;
+
+  // Keyboard shortcuts — Space, arrows, M
+  useKeyboardShortcuts({
+    onPlayPause: () => setIsPlaying((p) => !p),
+    onVolumeUp: () => {
+      setIsMuted(false);
+      setVolume((v) => Math.min(100, v + 10));
+    },
+    onVolumeDown: () => setVolume((v) => Math.max(0, v - 10)),
+    onSeekForward: () => setProgress((p) => Math.min(100, p + 5)),
+    onSeekBackward: () => setProgress((p) => Math.max(0, p - 5)),
+    onMute: () => {
+      if (isMuted) {
+        setIsMuted(false);
+        setVolume(prevVolume);
+      } else {
+        setPrevVolume(volume);
+        setIsMuted(true);
+      }
+    },
+  });
+
+  // Swipe gestures on the player (mobile)
+  useSwipeGesture(playerRef as React.RefObject<HTMLElement>, {
+    onSwipeLeft: () => console.log("Next track"),
+    onSwipeRight: () => console.log("Previous track"),
+  });
+
+  const handleMuteToggle = () => {
+    if (isMuted) {
+      setIsMuted(false);
+      setVolume(prevVolume);
+    } else {
+      setPrevVolume(volume);
+      setIsMuted(true);
+    }
+  };
 
   return (
-    <footer className={styles.player} role="region" aria-label="Audio player">
-      {/* LEFT: Track Info */}
+    <footer
+      ref={playerRef}
+      className={styles.player}
+      role="region"
+      aria-label="Audio player"
+    >
+      {/* ── LEFT: Track Info ── */}
       <div className={styles.trackInfo}>
         <div className={styles.albumArt}>
           <Image
@@ -66,23 +114,23 @@ export function AudioPlayer({ track }: AudioPlayerProps) {
             className="w-full h-full object-cover"
           />
         </div>
+
         <div className={styles.trackText}>
           {isPlaying && <Waveform />}
           <span className={styles.trackName}>{currentTrack.title}</span>
           <span className={styles.artistName}>{currentTrack.artist}</span>
         </div>
-        {/* Heart icon — Tailwind utility here is fine */}
+
+        {/* Heart / like button */}
         <button
           className={cn(
-            "p-1 ml-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors",
+            "p-1 ml-2 flex-shrink-0",
+            "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
+            "transition-colors duration-200"
           )}
+          aria-label="Save to liked songs"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -93,9 +141,10 @@ export function AudioPlayer({ track }: AudioPlayerProps) {
         </button>
       </div>
 
-      {/* CENTER: Controls */}
+      {/* ── CENTER: Controls + Progress ── */}
       <div className={styles.controls}>
         <div className={styles.controlButtons}>
+
           {/* Shuffle */}
           <button
             onClick={() => setIsShuffled(!isShuffled)}
@@ -115,7 +164,7 @@ export function AudioPlayer({ track }: AudioPlayerProps) {
             </svg>
           </button>
 
-          {/* Play/Pause */}
+          {/* Play / Pause */}
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             className={styles.playBtn}
@@ -126,11 +175,7 @@ export function AudioPlayer({ track }: AudioPlayerProps) {
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
               </svg>
             ) : (
-              <svg
-                className="w-4 h-4 ml-0.5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
             )}
@@ -156,11 +201,12 @@ export function AudioPlayer({ track }: AudioPlayerProps) {
           </button>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress bar */}
         <div className={styles.progressContainer}>
           <span className={styles.timeLabel} aria-label="Current time">
             {formatTime(currentSeconds)}
           </span>
+
           <div
             className={styles.progressBar}
             role="slider"
@@ -171,40 +217,60 @@ export function AudioPlayer({ track }: AudioPlayerProps) {
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const x = e.clientX - rect.left;
-              setProgress((x / rect.width) * 100);
+              setProgress(Math.max(0, Math.min(100, (x / rect.width) * 100)));
             }}
           >
-            <div
-              className={styles.progressFill}
-              style={{ width: `${progress}%` }}
-            />
+            <div className={styles.progressFill} style={{ width: `${progress}%` }} />
           </div>
+
           <span className={styles.timeLabel} aria-label="Total duration">
             {formatTime(currentTrack.duration)}
           </span>
         </div>
       </div>
 
-      {/* RIGHT: Volume */}
+      {/* ── RIGHT: Volume ── */}
       <div className={styles.volumeSection}>
-        <button className={cn(styles.controlBtn)} aria-label="Toggle mute">
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-          </svg>
+        {/* Mute toggle — icon changes based on volume level */}
+        <button
+          onClick={handleMuteToggle}
+          className={cn(styles.controlBtn)}
+          aria-label={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted || displayVolume === 0 ? (
+            // Muted icon
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+            </svg>
+          ) : displayVolume < 50 ? (
+            // Low volume icon
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z" />
+            </svg>
+          ) : (
+            // Full volume icon
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+            </svg>
+          )}
         </button>
+
+        {/* Volume bar */}
         <div
           className={styles.volumeBar}
-          onClick={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            setVolume(((e.clientX - rect.left) / rect.width) * 100);
-          }}
           role="slider"
           aria-label="Volume"
-          aria-valuenow={Math.round(volume)}
+          aria-valuenow={Math.round(displayVolume)}
           aria-valuemin={0}
           aria-valuemax={100}
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const newVol = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+            setVolume(newVol);
+            setIsMuted(false);
+          }}
         >
-          <div className={styles.volumeFill} style={{ width: `${volume}%` }} />
+          <div className={styles.volumeFill} style={{ width: `${displayVolume}%` }} />
         </div>
       </div>
     </footer>

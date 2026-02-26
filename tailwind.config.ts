@@ -144,13 +144,22 @@
 
 import type { Config } from "tailwindcss";
 
+
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  // In v4, most theme extensions go in CSS with @theme
+
+  // Class-based dark mode — ThemeProvider adds 'dark' class to <html>
+  darkMode: "class",
+
+  plugins: [
+    // These still work in v4 as plugins
+    // require("@tailwindcss/forms"),
+    // require("@tailwindcss/typography"),
+  ],
 };
 
 export default config;
