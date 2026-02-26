@@ -1,9 +1,73 @@
+/* app/globals.css */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
-/* 2. Tailwind Import */
+
 @import "tailwindcss";
 
-/* 3. NEW v4 WAY: Define your custom utilities here */
+
+@theme {
+  /* Font Families */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Font Sizes with line heights */
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+
+  /* Custom spacing */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-sidebar: 240px;
+  --spacing-player: 90px;
+
+  /* Border radius */
+  --radius-card: 8px;
+  --radius-pill: 500px;
+  --radius-circle: 50%;
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-in-left: slide-in-left 0.3s ease-out;
+  --animate-shimmer: shimmer 1.5s infinite;
+
+  @keyframes fade-in {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-in-left {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+}
+
+/* 3. Theme variables (your existing ones are perfect) */
 .dark {
   /* Surfaces */
   --surface-base: #191414;
@@ -34,12 +98,9 @@
   --border-strong: #777777;
   --border-focus: #ffffff;
 
-  /* Shadows */
-  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.8);
+  /* Shadows - moved to utilities since v4 handles shadows differently */
 }
 
-/* LIGHT THEME */
 .light {
   --surface-base: #ffffff;
   --surface-elevated: #f6f6f6;
@@ -64,12 +125,8 @@
   --border-default: #e8e8e8;
   --border-strong: #b3b3b3;
   --border-focus: #191414;
-
-  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.2);
 }
 
-/* HIGH CONTRAST THEME — Accessibility */
 .high-contrast {
   --surface-base: #000000;
   --surface-elevated: #0a0a0a;
@@ -81,7 +138,7 @@
   --text-disabled: #888888;
   --text-inverse: #000000;
 
-  --accent-primary: #00ff66; /* Brighter green for higher contrast */
+  --accent-primary: #00ff66;
   --accent-hover: #33ff85;
   --accent-active: #00cc52;
   --accent-subtle: rgba(0, 255, 102, 0.2);
@@ -94,24 +151,18 @@
   --border-default: #444444;
   --border-strong: #ffffff;
   --border-focus: #00ff66;
-
-  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.9);
-  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 1);
 }
 
-/* ─────────────────────────────────────────────────────
-   BASE LAYER — resets + global element styles
-───────────────────────────────────────────────────── */
+/* 4. Base styles */
 @layer base {
   *,
   *::before,
   *::after {
-    @apply box-border;
+    box-sizing: border-box;
   }
 
   html {
-    @apply scroll-smooth;
-    /* Smooth theme transitions — applies to ALL elements */
+    scroll-behavior: smooth;
     color-scheme: dark;
   }
 
@@ -122,8 +173,12 @@
   body {
     background-color: var(--surface-base);
     color: var(--text-primary);
-    @apply font-body antialiased transition-colors duration-300;
-    /* Theme switch is smooth because of this transition */
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 300ms;
+    transition-timing-function: ease;
   }
 
   /* Smooth transition for ALL theme-aware properties */
@@ -135,20 +190,16 @@
     transition-timing-function: ease;
   }
 
-  /* Override for things that should NOT have theme transitions
-     (animations, transforms, etc.) */
   .no-theme-transition,
   .no-theme-transition * {
     transition: none !important;
   }
 
-  /* Focus ring — visible and high-contrast */
   :focus-visible {
     outline: 2px solid var(--border-focus);
     outline-offset: 2px;
   }
 
-  /* Respect reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -159,7 +210,6 @@
     }
   }
 
-  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -175,79 +225,148 @@
   }
 }
 
-/* ─────────────────────────────────────────────────────
-   COMPONENT LAYER — reusable class utilities
-───────────────────────────────────────────────────── */
-@layer components {
-  /* Typography scale */
-  .text-display-xl {
-    @apply font-display text-6xl font-extrabold tracking-tight leading-none;
-  }
-  .text-display-lg {
-    @apply font-display text-5xl font-bold tracking-tight leading-tight;
-  }
-  .text-heading-xl {
-    @apply font-display text-4xl font-bold leading-tight;
-  }
-  .text-heading-lg {
-    @apply font-display text-3xl font-bold;
-  }
-  .text-heading-md {
-    @apply font-display text-2xl font-semibold;
-  }
-  .text-heading-sm {
-    @apply font-display text-xl font-semibold;
-  }
-  .text-body-lg {
-    @apply font-body text-lg;
-  }
-  .text-body-md {
-    @apply font-body text-base;
-  }
-  .text-body-sm {
-    @apply font-body text-sm;
-  }
-  .text-caption {
-    @apply font-body text-xs uppercase tracking-wider;
-  }
-  .text-label {
-    @apply font-body text-sm font-semibold;
-  }
+/* 5. Custom utilities with @utility (v4 way) */
+@utility surface-base {
+  background-color: var(--surface-base);
+}
 
-  /* Surface utilities */
-  .surface-base {
-    background-color: var(--surface-base);
-  }
-  .surface-elevated {
-    background-color: var(--surface-elevated);
-  }
-  .surface-overlay {
-    background-color: var(--surface-overlay);
-  }
+@utility surface-elevated {
+  background-color: var(--surface-elevated);
+}
 
-  /* Text utilities */
-  .text-primary-color {
-    color: var(--text-primary);
-  }
-  .text-secondary-color {
-    color: var(--text-secondary);
-  }
-  .text-accent {
-    color: var(--accent-primary);
-  }
+@utility surface-overlay {
+  background-color: var(--surface-overlay);
+}
 
-  /* Interactive base */
-  .interactive {
-    @apply cursor-pointer select-none transition-all duration-200;
-    @apply focus-visible:outline-2 focus-visible:outline-offset-2;
-    outline-color: var(--border-focus);
-  }
+@utility text-primary-color {
+  color: var(--text-primary);
+}
 
-  /* Spotify pill button base */
-  .btn-base {
-    @apply inline-flex items-center justify-center gap-2
-           font-body font-bold rounded-full
-           transition-all duration-200 cursor-pointer select-none
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+@utility text-secondary-color {
+  color: var(--text-secondary);
+}
+
+@utility text-accent {
+  color: var(--accent-primary);
+}
+
+@utility interactive {
+  cursor: pointer;
+  user-select: none;
+  transition-property: all;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+  
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
   }
+}
+
+@utility btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  border-radius: 9999px;
+  transition-property: all;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+  cursor: pointer;
+  user-select: none;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+/* Typography utilities */
+@utility text-display-xl {
+  font-family: var(--font-display);
+  font-size: var(--text-6xl);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+@utility text-display-lg {
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+@utility text-heading-xl {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility text-heading-lg {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+}
+
+@utility text-heading-md {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+}
+
+@utility text-heading-sm {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+@utility text-body-lg {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+}
+
+@utility text-body-md {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+}
+
+@utility text-body-sm {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+
+@utility text-caption {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@utility text-label {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* Shadow utilities since we can't use theme vars directly in v4 shadows */
+@utility shadow-card {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+@utility shadow-card-hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+}
+
+@utility shadow-modal {
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8);
+}
+
+@utility shadow-glow {
+  box-shadow: 0 0 20px rgba(29, 185, 84, 0.3);
 }

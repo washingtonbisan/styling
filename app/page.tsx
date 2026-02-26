@@ -14,30 +14,53 @@ import { useModal } from "@/components/modal/useModal";
 const albums = [
   {
     id: 1,
-    title: "Liked Songs",
-    description: "Your personal playlist",
-    imageUrl: "/placeholder.jpg",
+    title: "Midnight Vibes",
+    description: "The Weeknd, SZA, Frank Ocean and more",
+    imageUrl: "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?q=80&w=800&auto=format&fit=crop",
   },
   {
     id: 2,
-    title: "Daily Mix 1",
-    description: "Drake, Kendrick Lamar and more",
-    imageUrl: "/placeholder.jpg",
+    title: "Afrobeats Essentials",
+    description: "Burna Boy, Wizkid, Tems and more",
+    imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop",
   },
   {
     id: 3,
-    title: "Discover Weekly",
-    description: "Made for you – fresh picks every Monday",
-    imageUrl: "/placeholder.jpg",
+    title: "Coding Flow",
+    description: "Lo-fi beats to focus and build",
+    imageUrl: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop",
   },
   {
     id: 4,
-    title: "Release Radar",
-    description: "Catch all the latest music from artists you follow",
-    imageUrl: "/placeholder.jpg",
+    title: "Global Pop Hits",
+    description: "Dua Lipa, Taylor Swift, Olivia Rodrigo and more",
+    imageUrl: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?q=80&w=800&auto=format&fit=crop",
+  },
+  {
+    id: 5,
+    title: "Chill Instrumentals",
+    description: "Relaxing piano and ambient sounds",
+    imageUrl: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=800&auto=format&fit=crop",
+  },
+  {
+    id: 6,
+    title: "Street Rap Energy",
+    description: "J. Cole, Travis Scott, Lil Baby and more",
+    imageUrl: "https://images.unsplash.com/photo-1485579149621-3123dd979885?q=80&w=800&auto=format&fit=crop",
+  },
+  {
+    id: 7,
+    title: "Sunday Acoustic",
+    description: "Ed Sheeran, John Mayer, Adele and more",
+    imageUrl: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=800&auto=format&fit=crop",
+  },
+  {
+    id: 8,
+    title: "Electronic Rush",
+    description: "Calvin Harris, David Guetta, Tiësto and more",
+    imageUrl: "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=800&auto=format&fit=crop",
   },
 ];
-
 export default function Home() {
   const modal = useModal();
   const [inputValue, setInputValue] = useState("");
@@ -51,11 +74,10 @@ export default function Home() {
         <Container>
           <div className="text-center space-y-6 animate-fade-in">
             <h1 className="text-heading-xl text-5xl md:text-6xl font-display font-bold">
-              Design System <span className="text-spotify-green">Showcase</span>
+              Spotify
             </h1>
             <p className="text-body-lg text-[var(--text-secondary)] max-w-xl mx-auto">
-              Spotify-caliber components built with Tailwind CSS, design tokens,
-              and accessibility-first principles.
+              Tap into the world of endless music with Spotify.
             </p>
 
             {/* Button Variants */}
